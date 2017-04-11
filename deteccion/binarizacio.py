@@ -21,17 +21,20 @@ _,binaria = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 # Se hace una cerradura
 kernel = np.ones((3,3),np.uint8)
 imagenBiaria = cv2.morphologyEx(binaria, cv2.MORPH_CLOSE, kernel)
-
+imagenBiaria = cv2.morphologyEx(binaria, cv2.MORPH_CLOSE, kernel)
 cv2.imshow("Binaria", imagenBiaria)
 
 bordes = cv2.Canny(binaria, 30, 200)
-cv2.imshow("canny", bordes)
 
-im2, contours, hierarchy = cv2.findContours(binaria,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-	#contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+im2, contours, hierarchy = cv2.findContours(bordes,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
-cv2.drawContours(img, contours, -1, (0,120,0), 3)
-cv2.imshow("bordes", img)
+cv2.drawContours(binaria, contours, 50, (120,243,0), 3)
+cv2.imshow("bordes", binaria)
+
+cv2.imshow("aaaaaaa", contours[1][1])
+print(contours[50])
+print(contours[50][0][0][0])
+
 
 
 print("--- %s seconds ---" % (time.time() - start_time))
