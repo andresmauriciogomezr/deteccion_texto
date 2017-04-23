@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # Para silenciar unos Warnings fastidiosos	
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
@@ -47,6 +50,7 @@ for i in range(1,150):
 	pass
 print "Entrenamiento terminado..."
 
+# Calculando la probabilidad error
 prediction = sess.run(y, feed_dict={x:mnist.test.images ,y_: mnist.test.labels})
 
 errors = 0.0
@@ -54,22 +58,26 @@ for i in range(prediction.shape[0]):
 	if np.argmax(prediction[i]) != np.argmax(mnist.test.labels[i]):
 		errors += 1
 
-print "Test error : " + str(errors/(prediction.shape[0]))
+print "Probabilidad error : " + str(errors/(prediction.shape[0]))
 
+""" muestra los pesos --- no borrar -- descomentar para ver los pesos
 pesos = sess.run(W)
 
 for i in xrange(0,10):
 	plt.imshow(pesos[:, i].reshape(28,28), cmap="bwr")
-	#plt.show()
+	plt.show()
 	pass
+"""
 
 
+# *********** Prueba *******************
 
-#prueba
-#prediction = sess.run(y, feed_dict={x:mnist.test.images[2:3]})
-prediction = sess.run(y, feed_dict={x:[mnist.test.images[2]]})
-print np.argmax(prediction)
-plt.imshow(mnist.test.images[2,:].reshape(28,28), cmap="bwr")
+# Se hace la clasificación de la imagen numero dos de las imagenes de prueba
+prediction = sess.run(y, feed_dict={x:[mnist.test.images[2]]}) 
+print "Resultado index clasificación : " + str(np.argmax(prediction)) # Muestra el indice del digito con mas probabilidad
+
+#Muestra la imagen que se esta clasiicando
+plt.imshow(mnist.test.images[2,:].reshape(28,28), cmap="gray")
 plt.show()
 
 
