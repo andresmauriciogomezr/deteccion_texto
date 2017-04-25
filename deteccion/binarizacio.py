@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import time
 from random import randint
 import math
-from PIL import Image, ImageDraw
+
 
 start_time = time.time()
 
@@ -39,7 +39,7 @@ nuevosContornos = []
 # Se filtran los contornos que tengan un area menor al 2% del area de la imagen
 i = 0
 for contorno in contours:
-	if cv2.contourArea(contorno) >= (areaImagen * 2) / float(100) and i %2 == 0:
+	if cv2.contourArea(contorno) >= (areaImagen * 2) / float(100) and i %2 == 0 and cv2.contourArea(contorno) <= (areaImagen * 50) / float(100):
 	#if cv2.contourArea(contorno) >= (areaImagen * 2) / float(100):
 		
 		nuevosContornos.append(contorno) # Agrega el contorno
@@ -49,14 +49,62 @@ for contorno in contours:
 		x,y,w,h = cv2.boundingRect(contorno) # Encuentra el rectangulo que se ajusta al contorno
 		cv2.rectangle(binaria,(x,y),(x+w,y+h),(0,255,0),2) # Dibuja el rectangulo		
 
-		recorte = img[y:y+h, x:x+w] # Recorta el pedazo de itenres de la imagen
+		#recorte = img[y:y+h, x:x+w] # Recorta el pedazo de itenres de la imagen
 		
-		if len(recorte) > 0: # El recorte coniene algo
+		#if len(recorte) > 0: # El recorte coniene algo
 			#print str(len(recorte)) + " " + str(len(recorte[0]))
-			cv2.imshow("recorte" + str(i), recorte)
+		#	cv2.imshow("recorte" + str(i), recorte)
 	i += 1
 
 cv2.imshow("binaria", binaria) # Muestra la imagen binarizada
+
+contornosOrdenados = nuevosContornos[:len(nuevosContornos)] # copia de los contornos identificados
+
+# se usa el metodo de ordenamiento burbuja
+i = 0
+size = len(contornosOrdenados)
+
+while (i < size):
+        j=i   
+        while(j < size):
+                x0,y0,w0,h0 = cv2.boundingRect(contornosOrdenados[i]) # encuentra el recuadro para i
+                x1,y1,w1,h1 = cv2.boundingRect(contornosOrdenados[j]) # encuentra el recuadro para j
+                if(x0 > x1): # compara para saber quien es mayor
+                        # cambio por temporal
+                        temp = contornosOrdenados[i]
+                        contornosOrdenados[i] = contornosOrdenados[j]
+                        contornosOrdenados[j] = temp
+        
+                j=j+1
+
+        i=i+1 
+                
+
+# Se visualiza los recortes ordenados
+i = 0
+for contorno in contornosOrdenados:
+        x,y,w,h = cv2.boundingRect(contorno) # encuentra el recuadro
+        recorte = img[y:y+h, x:x+w] # recorte de la imagen
+        if len(recorte) > 0: # El recorte coniene algo
+                        #print str(len(recorte)) + " " + str(len(recorte[0]))
+                cv2.imshow("recorte" + str(i), recorte)	# se muetra
+        i = i+1
+
+
+# transformacion a 28 *28
+
+width = 28
+height = 28
+
+i = 0
+for contorno in contornosOrdenados:
+        x,y,w,h = cv2.boundingRect(contorno) # encuentra el recuadro
+        recorte = img[y:y+h, x:x+w] # recorte de la imagen
+        if len(recorte) > 0: # El recorte coniene algo
+                        #print str(len(recorte)) + " " + str(len(recorte[0]))
+                recorte = cv2.resize(recorte, (width,height)) # redimension de 28 * 28
+                cv2.imshow("recorte" + str(i), recorte)	# se muetra
+        i = i+1
 
 
 #cv2.imshow("bordes", binaria)
