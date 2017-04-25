@@ -103,6 +103,7 @@ for contorno in contornosOrdenados:
         if len(recorte) > 0: # El recorte coniene algo
                         #print str(len(recorte)) + " " + str(len(recorte[0]))
                 recorte = cv2.resize(recorte, (width,height)) # redimension de 28 * 28
+                cv2.imwrite("/uptc/Inteligencia Computacional/deteccion_texto/img" + str(i) + ".jpg",recorte)
                 cv2.imshow("recorte" + str(i), recorte)	# se muetra
         i = i+1
 
