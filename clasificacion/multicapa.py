@@ -185,7 +185,7 @@ testLoss = [] # Evaluar el entrenamiento en cada paso
 # Entranado la red -- no sobre todo el conjunto de etrenamiento sino de una muestra estocastica-- 150 iteraciones
 for i in range(1,80):
 	batchx, batchy = mnist.train.next_batch(500) # Muestra estocastica de 1000 imagenes
-
+	print batchy[0]
 	# Ejecuta una sesion de entrenamiento
 	sess.run(train_step, feed_dict = {x:batchx, y_:batchy} ) # feed_dict es un diccionario con los datos 	
 
