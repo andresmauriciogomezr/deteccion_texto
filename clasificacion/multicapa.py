@@ -13,6 +13,7 @@ import cv2
 import time
 from random import randint
 import math
+#import datos
 
 
 class Detector:
@@ -108,12 +109,11 @@ class Detector:
 
 		# transformacion a 28 *28
 
-		cv2.normalize(img,  img, 0, 1, cv2.NORM_MINMAX)
-		#print img
-
-
 		width = 28
 		height = 28
+
+		#Normaliza la imagen
+		cv2.normalize(img,  img, 0, 1, cv2.NORM_MINMAX)
 
 		i = 0
 		recortes = []
@@ -121,10 +121,24 @@ class Detector:
 		        x,y,w,h = cv2.boundingRect(contorno) # encuentra el recuadro
 		        recorte = img[y:y+h, x:x+w] # recorte de la imagen
 		        if len(recorte) > 0: # El recorte coniene algo
-		                        #print str(len(recorte)) + " " + str(len(recorte[0]))		                   
+
+
+					ancho = len(recorte[0])
+	                alto = len(recorte)
+
+	                if ancho != alto:
+	                	imagenAuxiliar = np.ones((alto,alto))
+	                	limite = alto/4
+
+	                	for i in xrange(0,len(recorte)):
+	                		for j in xrange(0,len(recorte[i])):
+	                			imagenAuxiliar[i][j+limite] = recorte[i][j]
+	                		pass
+	                	
+	                	recorte = imagenAuxiliar
 		                recorte = cv2.resize(recorte, (width,height)) # redimension de 28 * 28
 		                #recorte = 1 / recorte
-		                recortes.append(recorte)
+		                recortes.append(recorte.reshape(784))
 		                #cv2.imwrite("/uptc/Inteligencia Computacional/deteccion_texto/img" + str(i) + ".jpg",recorte)
 		                #cv2.imshow("recorte2" + str(i), recorte)	# se muetra
 		        i = i+1
@@ -182,10 +196,11 @@ sess.run(init)
 trainLoss = [] # Datos de entrenamiento en cada paso
 testLoss = [] # Evaluar el entrenamiento en cada paso
 
+print ""
+print "Entrenando ..."
 # Entranado la red -- no sobre todo el conjunto de etrenamiento sino de una muestra estocastica-- 150 iteraciones
 for i in range(1,80):
 	batchx, batchy = mnist.train.next_batch(500) # Muestra estocastica de 1000 imagenes
-	print batchy[0]
 	# Ejecuta una sesion de entrenamiento
 	sess.run(train_step, feed_dict = {x:batchx, y_:batchy} ) # feed_dict es un diccionario con los datos 	
 
@@ -210,13 +225,19 @@ print "Test error : " + str(errors/(prediction.shape[0]))
 
 detector = Detector()
 recortes = detector.recortar()
-recortes[3].reshape(784)
 
+for recorte in recortes:
+	plt.imshow(recorte.reshape(28,28), 'gray')
+	plt.show()
 
 #prueba = sess.run(y, feed_dict={x:[mnist.test.images[3]]})
-prueba = sess.run(y, feed_dict={x:[recortes[4].reshape(784)]})
-print "Resultado index clasificación : " + str(np.argmax(prueba)) # Muestra el indice del digito con mas probabilidad
+prueba = sess.run(y, feed_dict={x:recortes})
+#print "Resultado index clasificación : " + str(np.argmax(prueba)) # Muestra el indice del digito con mas probabilidad
 #Muestra la imagen que se esta clasiicando
 #plt.imshow(mnist.test.images[3,:].reshape(28,28), cmap="gray")
-plt.imshow(recortes[4])
-plt.show()
+
+for i in xrange(3,len(recortes)):
+	plt.imshow(recortes[i].reshape(28,28))
+	print "Resultado index clasificación : " + str(np.argmax(prueba[i]))
+	plt.show()
+	pass
